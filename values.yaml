@@ -16,7 +16,7 @@ global:
   # Examples:
   #   image: "consul:1.5.0"
   #   image: "hashicorp/consul-enterprise:1.5.0-ent"   # Enterprise Consul image
-  image: "consul:1.5.0"
+  image: "consul:1.5.1"
 
   # imageK8S is the name (and tag) of the consul-k8s Docker image that
   # is used for functionality such as the catalog sync. This can be overridden
@@ -30,7 +30,7 @@ global:
   # as. This shouldn't be changed once the Consul cluster is up and running
   # since Consul doesn't support an automatic way to change this value
   # currently: https://github.com/hashicorp/consul/issues/1858
-  datacenter: dc1
+  datacenter: wsg
 
   # enablePodSecurityPolicies is a boolean flag that controls whether pod
   # security policies are created for the consul components created by this
@@ -49,7 +49,7 @@ global:
   # the Consul cluster. This currently requires enabling both servers and
   # clients within Kubernetes. Additionally requires Consul v1.4+ and
   # consul-k8s v0.8.0+.
-  bootstrapACLs: false
+  bootstrapACLs: true
 
 # Server, when enabled, configures a server cluster to run. This should
 # be disabled if you plan on connecting to a Consul cluster external to
@@ -118,15 +118,17 @@ server:
   # Affinity Settings
   # Commenting out or setting as empty the affinity variable, will allow
   # deployment to single node services such as Minikube
-  affinity: |
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchLabels:
-              app: {{ template "consul.name" . }}
-              release: "{{ .Release.Name }}"
-              component: server
-          topologyKey: kubernetes.io/hostname
+  affinity: null
+  #affinity: |
+  #  podAntiAffinity:
+  #    requiredDuringSchedulingIgnoredDuringExecution:
+  #      - labelSelector:
+  #          matchLabels:
+  #            app: {{ template "consul.name" . }}
+  #            release: "{{ .Release.Name }}"
+  #            component: server
+  #        topologyKey: kubernetes.io/hostname
+
 
   # Toleration Settings for server pods
   # This should be a multi-line string matching the Toleration array
@@ -168,7 +170,7 @@ client:
 
   # grpc should be set to true if the gRPC listener should be enabled.
   # This should be set to true if connectInject is enabled.
-  grpc: false
+  grpc: true
 
   # Resource requests, limits, etc. for the client cluster placement. This
   # should map directly to the value of the resources field for a PodSpec,
@@ -265,7 +267,7 @@ ui:
 # Consul agent.
 syncCatalog:
   # True if you want to enable the catalog sync. "-" for default.
-  enabled: false
+  enabled: true
   image: null
   default: true # true will sync by default, otherwise requires annotation
 
@@ -319,7 +321,7 @@ syncCatalog:
 
 # ConnectInject will enable the automatic Connect sidecar injector.
 connectInject:
-  enabled: false
+  enabled: true
   image: null # image for consul-k8s that contains the injector
   default: false # true will inject by default, otherwise requires annotation
 
